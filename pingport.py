@@ -24,9 +24,10 @@ def search_routers(a):
     # 循环本地网卡IP列表
     for ip in local_ips:
         ip='107.172.99.187'
+        ip='172.246.62.66'
         # array[2]=str(97)
         # for i in range( 128,255):
-        for i in range(1, 128):
+        for i in range(185, 189):
             # 把网卡IP"."进行分割,生成每一个可用地址的列表
             # if int(array[2])<105:
             #     array[2]=str(int(array[2])+1)

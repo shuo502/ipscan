@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+     <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="default" name="apple-mobile-web-app-status-bar-style">
+    <link rel="stylesheet" media="all" href="//cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.css"/>
+    <script src="//cdn.staticfile.org/jquery/1.10.2/jquery.js"></script>
+    <script src="//cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.js"></script>
+</head>
+<body>
+<script>
+    function f() {
+        //var yuanma=document.documentElement.outerHTML;
+     for (var i = 0;i < $('meta').length;i++){
+         var   a=$("meta").eq(i).attr("name");
+         var   a1=$("meta").eq(i).attr("content");
+            $("#s").text( $("#s").text()+a+":"+a1+"\n");
+    }
+    }
+
+ $(document).ready(function () {
+
+ })
+   // $(document).ready(function () {
+   //     $("head").append('<meta http-equiv="refresh" content="5">');
+    //});
+//document.querySelector('meta[name="seg-user"]').getAttribute('content')
+
+
+</script>
+<div id="s"></div>
+<button onclick="f()">check</button>
+</body>
+</html>
