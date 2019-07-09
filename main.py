@@ -16,15 +16,15 @@ def p_webopen():
     port = {
         "http0": 80,
         "http1": 81,
-        "http2": 82,
-        "http3": 88,
+        # "http2": 82,
+        # "http3": 88,
         "http4": 8000,
         "http5": 8080,
         "http6": 8888,
-        "http7": 888,
-        "http8": 9000,
-        "http9": 5000,
-        "http10": 1080,
+        # "http7": 888,
+        # "http8": 9000,
+        # "http9": 5000,
+        # "http10": 1080,
     }
     pass
     return port
@@ -39,9 +39,10 @@ def p_sslwebopen():
 
 
 def p_dbopen():
-    port = {'mongodb': 27017,
-            'oracle': 1521,
-            'mongodb2': 2888,
+    port = {
+        # 'mongodb': 27017,
+        #     'oracle': 1521,
+        #     'mongodb2': 2888,
             'mysql': 3306,
             "mssql": 1433
 
@@ -75,13 +76,14 @@ def p_app():
 # 定义查询路由函数
 def search_routers(port_list,ip="107.172.99.187",t_s=1,t_e=254):
     all_threads = []
-    for i in range(t_s,t_e+1):
-        array = ip.split('.')
-        array[3] = str(i)
-        new_ip = '.'.join(array)
-        if int(t_e)==1:
-            new_ip=ip
-        for port in port_list:
+
+    for port in port_list:
+        for i in range(t_s,t_e+1):
+            array = ip.split('.')
+            array[3] = str(i)
+            new_ip = '.'.join(array)
+            if int(t_e)==1:
+                new_ip=ip
             dst_port = int(port_list[port])
             # 循环创建线程去链接该地址
 
@@ -132,7 +134,7 @@ def check_ip1(new_ip, port):
 import time
 def check_ip(new_ip, port):
     sem.acquire()#上锁
-    time.sleep(5)
+    time.sleep(2)
     scan_link = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     scan_link.settimeout(8)
     result = scan_link.connect_ex((new_ip, port))
@@ -144,7 +146,7 @@ def check_ip(new_ip, port):
         else:
             scan_dict[new_ip]=[]
             scan_dict[new_ip].append(port)
-        print( "{}:{}".format(new_ip,scan_dict[new_ip] ))
+        print( "{}-:-{}".format(new_ip,scan_dict[new_ip] ))
     sem.release()#解锁
 
 if __name__ == "__main__":
@@ -152,8 +154,8 @@ if __name__ == "__main__":
     sem=threading.Semaphore(100)
     scan_dict={}
     port_list = {}
-    p=p_app()
-    port_list = dict(port_list, **p)
+    # p=p_app()
+    # port_list = dict(port_list, **p)
     p=p_dbopen()
     port_list = dict(port_list, **p)
     p=p_manage()
@@ -162,11 +164,20 @@ if __name__ == "__main__":
     port_list = dict(port_list, **p)
     p=p_webopen()
     port_list = dict(port_list, **p)
-    ips='172.247.198.153'
-    search_routers(port_list=port_list,ip=ips)
-    for i in scan_dict:
-        y=sorted(scan_dict[i])
-        print(i,y)
+    port_list={"ssl":80,"ftp":21,"ssh":22,"http":443,"h2":8000,"hx":3306,"h3":8888}
+    print(port_list)
+    for i in range(24,103):
+        ips='23.95.{}.0'.format(i)
+        print(ips)
+        search_routers(port_list=port_list,ip=ips,t_s=1,t_e=254)
+        with open("ip.txt","a",encoding="utf-8") as f:
+            for i in scan_dict:
+                y=sorted(scan_dict[i])
+                e="{}:{}\n".format(i,y)
+                print(e)
+                f.write(e)
+
+        time.sleep(100)
 
     # 设置需要扫描的端口号列表
     # port_list = ['80','8080','21','22','23','3389','3306','27017','1433','1521','5001','5000','9000']

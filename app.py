@@ -34,7 +34,7 @@ class Config(object):
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 import time
-time.sleep()
+time.sleep(h)
 static='./static'
 template_folder='./templates'
 app=Flask(__name__, static_folder=static, template_folder=template_folder,)
@@ -42,7 +42,17 @@ app.config.from_object(Config)
 base_path_dir = os.path.abspath(os.path.dirname(__file__))
 db = SQLAlchemy(app)
 
-
+class as_info_DB(db.Model):
+    __tablename__ = 'asinfodb'
+    id=db.Column(db.Integer, primary_key=True, autoincrement=True)
+    asid=db.Column(db.String(512), nullable=True, comment="")
+    ips=db.Column(db.String(512), nullable=True, comment="")
+    company=db.Column(db.String(512), nullable=True, comment="")
+    number=db.Column(db.String(512), nullable=True, comment="")
+    uptime=db.Column(db.DateTime, index=True, default=datetime.now)
+    __table_args__ = {
+        "mysql_charset": "utf8"
+    }
 class src_DB(db.Model):
     __tablename__ = 'srcdb'
     id=db.Column(db.Integer, primary_key=True, autoincrement=True)
