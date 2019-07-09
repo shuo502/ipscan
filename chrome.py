@@ -14,6 +14,7 @@ import math
 import codecs
 
 class Urls:
+    turl="https://bgp.he.net/AS174"
     ipipas='https://www.ipip.net/ip.html'
     ipas="https://whois.ipip.net/AS36352"
     # index='https://liveplatform.taobao.com/live/liveDetail.htm?spm=a1z9u.8142865.0.0.42f134edtcD30s&id=230205911611'
@@ -104,12 +105,12 @@ def main(chrome):
             chrome = input('输入webchrome:').strip()
     driver = webdriver.Chrome(executable_path=chrome)
     cookies = json.load(open('cookies.json', 'rb')) if os.path.isfile('cookies.json') else []
-    driver.get(Urls.ipipas)
+    driver.get(Urls.turl)
     if not cookies:
         input("请先手动登录, 完成后按回车继续:")
         cookies = driver.get_cookies()
         # cookies = {'thw': 'cn', ' cna': 'n2rIFFpPJH0CAXt1aEwGZ3WY', ' tg': '0', ' x': 'e%3D1%26p%3D*%26s%3D0%26c%3D0%26f%3D0%26g%3D0%26t%3D0%26__ll%3D-1%26_ato%3D0', ' hng': 'CN%7Czh-CN%7CCNY%7C156', ' UM_distinctid': '169276ffe86294-02f668bd8af519-58422116-1fa400-169276ffe892b4', ' miid': '960049641392677858', ' enc': 'lSUmox1Me%2BGZ1BxoGE%2BgegIjZdRACvQorjFufayiZ0BTKrnfL0d%2Bb83FoXAXZZdF%2F0zzoh%2FzKIPojxAQMQDNvg%3D%3D', ' t': '0e1adc5fe9cbf3030e43e83df57c40d6', ' cookie2': '5e90542bc00051017ee8974faeb95848', ' v': '0', ' _tb_token_': '3e13ee57e57be', ' unb': '4087646153', ' uc1': 'cookie16', ' sg': '%E5%BA%9732', ' _l_g_': 'Ug%3D%3D', ' skt': '8408cbc7525c09b7', ' cookie1': 'VqwS0EdjyC2q7gv4R3l9IY7LZoNrvUwijJPpvM9dFuA%3D', ' csg': '9ceb3ec6', ' uc3': 'vt3', ' existShop': 'MTU2MjA0Njk5Nw%3D%3D', ' tracknick': 'cuk%5Cu7F8E%5Cu5BB9%5Cu5DE5%5Cu5177%5Cu65D7%5Cu8230%5Cu5E97', ' lgc': 'cuk%5Cu7F8E%5Cu5BB9%5Cu5DE5%5Cu5177%5Cu65D7%5Cu8230%5Cu5E97', ' _cc_': 'VFC%2FuZ9ajQ%3D%3D', ' dnk': 'cuk%5Cu7F8E%5Cu5BB9%5Cu5DE5%5Cu5177%5Cu65D7%5Cu8230%5Cu5E97', ' _nk_': 'cuk%5Cu7F8E%5Cu5BB9%5Cu5DE5%5Cu5177%5Cu65D7%5Cu8230%5Cu5E97', ' cookie17': 'VyyZGEXCid08bg%3D%3D', ' mt': 'ci', ' _m_h5_tk': '62379c85c210e8ce975951a223c8d230_1562054919022', ' _m_h5_tk_enc': 'cece26c30ca3296baffaffc1f3b4ee6f', ' l': 'bBgegXHHvvMEVugMBOCZnurza779IIRAguPzaNbMi_5QM6L_t4QOkA-ppFp6Vj5R_ZYB4G2npwy9-etkm', ' isg': 'BFhY9iBdsSE4xJxHKqxvvKXPKYYq6bxYyFFr0pJJpxNGLfgXOlP5Ww8LZSW4PXSj'}
-
+        print(cookies)
         open('cookies.json', 'wb').write(json.dumps(cookies).encode('utf-8'))
 
     set_cookies(driver, cookies)
@@ -130,13 +131,13 @@ def main(chrome):
     #     url = driver.current_url
     # Session.token = re.findall(r'token=(\w+)', url)[0]
 chrome=None
-# main(chrome)
+main(chrome)
 
-cookies = json.load(open('cookies.json', 'rb')) if os.path.isfile('cookies.json') else []
-if not cookies:
-    main(chrome)
-result = requests.get(Urls.ipas, headers=Session.headers)
-print(result.content.decode())
+# cookies = json.load(open('cookies.json', 'rb')) if os.path.isfile('cookies.json') else []
+# if not cookies:
+#     main(chrome)
+# result = requests.get(Urls.ipas, headers=Session.headers)
+# print(result.content.decode())
 
 
 
