@@ -34,7 +34,7 @@ class Config(object):
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 import time
-time.sleep(h)
+time.sleep(3)
 static='./static'
 template_folder='./templates'
 app=Flask(__name__, static_folder=static, template_folder=template_folder,)
@@ -79,6 +79,7 @@ class r_re():
     r_title=re.compile(r'<title>雨花石-(.*?)</title>')
     r_body=re.compile(r'<div class="post-body">(.*?)<nav class="article-nav">',re.S)
 
+
 def get_link_to_db():
     for i in range(1,12):
         if i==1:
@@ -93,6 +94,7 @@ def get_link_to_db():
             idb.url=i
             db.session.add(idb)
             db.session.commit()
+
 def get_content_to_db():
     dbs=src_DB.query.filter_by(content=None).all()
     # dbs=src_DB.query.filter_by(content="").first()
@@ -101,12 +103,17 @@ def get_content_to_db():
         t_db=src_DB.query.filter_by(id=i.id).first()
         url=i.url
         t=requests.get(url).content.decode()
-        t_db.content=r_re.r_body.findall(str(t))[0]
+        t_db.content=r_re.r_body.findall(str(t))[0]#如果有图片，下载图片转换base64 替换插入
         t_db.title=r_re.r_title.findall(str(t))[0]
         # print(i)
         db.session.commit()
     pass
-if __name__ == "__main__":
+def get_content(t):
+    body=r_re.r_title.findall(str(t))[0]
+    title=r_re.r_title.findall(str(t))[0]
+    return body,title
 
-    get_content_to_db()
+if __name__ == "__main__":
+    pass
+    # get_content_to_db()
     # app.run(debug=False)

@@ -10,8 +10,9 @@ url="https://whois.ipip.net/AS36352"
 import base64 as b64
 import base64
 def rb_pic_to_base64_pic():
-    base64_data = base64.b64encode()
-    s = base64_data.decode()
+    with open("1.png",'rb') as f:
+        base64_data = base64.b64encode(f.read())
+        s = base64_data.decode()
     print('data:image/jpeg;base64,%s'%s)
 
 
@@ -35,3 +36,7 @@ e=0
 for i in range(t+1):
    e=e+256
 print(e-1-t)
+# rb_pic_to_base64_pic()
+x=[22,33,1,2,3,4]
+for i,k in enumerate(x):
+    print(i,k)
