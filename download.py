@@ -23,7 +23,9 @@ def downloadfile(url):
     global x
     file=check_path(url)
     if file:
-        time.sleep(0.5)
+        print(url)
+
+        # time.sleep(0.5)
 
         if x==True:
             x=False
@@ -35,32 +37,67 @@ def downloadfile(url):
             r = requests.get(url, headers=headers, timeout=5)
         else:
             r = requests.get(url, headers=headers , timeout=5 )
-        with open(str(file), "wb") as code:
-            code.write(r.content)
+        if r and len(str(r))>1000:
+            with open(str(file), "wb") as code:
+                code.write(r.content)
+from multiprocessing.dummy import Pool as ThreadPool
 with open("downimgurl.txt" ,"r",encoding="utf-8") as f:
     y=f.read()
 import time
 e=y.split("\n")
 x=True
-while 1:
-    e = y.split("\n")
-    u=""
-    try:
-        print(len(e))
-        for index,i in enumerate(e):
-            print(index,i)
-            u=i
-            downloadfile(i)
-        break
-    except Exception as e:
-        if x==True:
-            x=False
-        else:
-            x=True
-        print(e)
-        print("err :",u)
-        time.sleep(2)
-        downloadfile(i)
-        time.sleep(2)
-        pass
+err=0
 
+with open("oo.txt","a",encoding="utf-8") as b:
+    for i in e:
+        k=check_path(i)
+        if k:
+            b.write("{}\n".format(k))
+
+
+def a():
+# while 1:
+    for i in range(3):
+
+        e = y.split("\n")
+        u = ""
+        # for index,i in enumerate(e):
+        try:
+            # time.sleep(10)
+            # print(index,i)
+            # u=i
+            # downloadfile(i)
+            pool = ThreadPool(8)  # Sets the pool size to 4
+            # print(i)
+            results = pool.map(downloadfile, e)
+            pool.close()
+            pool.join()
+            err=0
+    # break
+        except Exception as ei:
+            # err=err+1
+            # if x==True:
+            #     x=False
+            # else:
+            #     x=True
+            print(ei)
+            print("err :",u)
+            # time.sleep(err*4)
+            # if err>10:
+            #     time.sleep(360)
+
+            pass
+        time.sleep(10)
+# def ()
+#             t = threading.Thread(target=check_ip, args=(new_ip, dst_port) )
+#             t.start()
+#             # 把新建的线程放到线程池
+#             all_threads.append(t)
+#     # 循环阻塞主线程，等待每一字子线程执行完，程序再退出
+#     for t in all_threads:
+#         t.join()
+
+# pool = ThreadPool(8) # Sets the pool size to 4
+# results = pool.map(downImg,data);
+# pool.close();
+# pool.join();
