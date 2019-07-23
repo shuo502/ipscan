@@ -17,5 +17,6 @@ with open("code.txt",'r',encoding='utf-8') as f:
 
 for i in y.split("\n"):
     print(i)
-    file="./code/{}.png".format(i)
-    code128.image(str(i)).save(file)  # with PIL present
+    if len(i):
+        file="./code/{}.png".format(i)
+        code128.image(str(i)).save(file)  # with PIL present
