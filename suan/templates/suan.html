@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>display_table</title>
+</head>
+<body>
+
+<!-- CSS goes in the document HEAD or added to your external stylesheet -->
+<style type="text/css">
+table.gridtable {
+font-family: verdana,arial,sans-serif;
+font-size:11px;
+color:#333333;
+border-width: 1px;
+border-color: #666666;
+border-collapse: collapse;
+}
+table.gridtable th {
+border-width: 1px;
+padding: 8px;
+border-style: solid;
+border-color: #666666;
+background-color: #dedede;
+}
+table.gridtable td {
+border-width: 1px;
+padding: 8px;
+border-style: solid;
+border-color: #666666;
+background-color: #ffffff;
+}
+</style>
+
+<!-- Table goes in the document BODY -->
+<table border="1" class="gridtable">
+<tr>
+<th>id编号</th><th>代理商姓名</th><th>上级代理</th><th>应收款</th><th>拿货折扣</th><th>佣金</th><th>反成本</th><th>直接销售</th>
+</tr>
+
+{%  for i in x %}
+<tr>
+<th>{{i[0]}}</th><th>{{i[1]}}</th><th>{{i[2]}}</th><th>{{i[3]}}</th><th>{{i[4]}}</th><th>{{i[5]}}</th><th>{{i[6]}}</th><th>{{i[7]}}</th>
+</tr>
+{% endfor %}
+
+
+
+</table>
+
+ <a>导出表格</a>
+
+    <script>
+        // 使用outerHTML属性获取整个table元素的HTML代码（包括<table>标签），然后包装成一个完整的HTML文档，设置charset为urf-8以防止中文乱码
+        var html = "<html><head><meta charset='utf-8' /></head><body>" + document.getElementsByTagName("table")[0].outerHTML + "</body></html>";
+        // 实例化一个Blob对象，其构造函数的第一个参数是包含文件内容的数组，第二个参数是包含文件类型属性的对象
+        var blob = new Blob([html], { type: "application/vnd.ms-excel" });
+        var a = document.getElementsByTagName("a")[0];
+        // 利用URL.createObjectURL()方法为a元素生成blob URL
+        a.href = URL.createObjectURL(blob);
+        // 设置文件名
+        a.download = "giftable.xls";
+    </script>
+</body>
+</html>

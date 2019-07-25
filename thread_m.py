@@ -51,7 +51,6 @@ def runscan():
         t.join()#join的操作使得后面的程序等待线程的执行完成才继续
 import requests
 def proxy(counter):
-
     requests.head("http://192.168.0.1")
     print(counter)
     time.sleep(3)
