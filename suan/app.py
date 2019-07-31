@@ -717,6 +717,7 @@ def get_gx():
             user_dict[i.id]['yongjin']=0
             user_dict[i.id]['koumoney']=0
             user_dict[i.id]['fankuan']=0
+            user_dict[i.id]['sellcont']=0
 
     e={}
     for i in user_dict:
@@ -815,6 +816,7 @@ def sell_logic(in_user_info,sellid,zksellpp):
     selfname = i_am['nickname']
     i_am['fankuan'] =i_am['selfsell']+i_am['downsell']+i_am['yongjin']
     i_am['koumoney'] = i_am['selfsell'] + i_am['downsell']
+    i_am['sellcont']=i_am['sellcont']+1
     logic_logs(i_am['id'],"[id{}:{}] 下单扣货款{} 货款{},本月总计下单货款{},销售反货款{}(需从货款中扣除),账户打钱{}".format(i_am['id'], i_am['nickname'], sellpp, i_am['money'], i_am['selfsell'],i_am['koumoney'],i_am['fankuan']))
     user_info[i_am['id']]=i_am
     new_p=i_am

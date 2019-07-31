@@ -35,7 +35,7 @@ background-color: #ffffff;
 <!-- Table goes in the document BODY -->
 <table border="1" class="gridtable">
 <tr>
-<th>id编号</th><th>代理商姓名</th><th>上级代理</th><th>应收款</th><th>拿货折扣</th><th>佣金</th><th>直接销售(原价计算)</th><th>代理销售(原价计算)</th><th>反钱</th>
+<th>id编号</th><th>代理商姓名</th><th>上级代理</th><th>应收款</th><th>拿货折扣</th><th>佣金</th><th>直接销售(原价计算)</th><th>代理销售(原价计算)</th><th>反钱</th><th>总计下单</th>
 </tr>
 
 {%  for dl in x %}
@@ -43,7 +43,7 @@ background-color: #ffffff;
 
     {% if i['is_distributor']==1 %}
 <tr>
-<th>{{i['id']}}</th><th>{{i['nickname']}}</th><th>{{i['updl']}}</th><th>{{i['money'] }} 扣反还{{ i['koumoney'] }}</th><th>{{i['zk']}}</th><th>{{i['yongjin']}}</th><th>{{i['selfsell']}}</th><th>{{i['downsell']}}</th><th>{{i['fankuan']}}</th>
+<th>{{i['id']}}</th><th>{{i['nickname']}}</th><th>{{i['updl']}}</th><th>{{i['money'] }} 扣反还{{ i['koumoney'] }}</th><th>{{i['zk']}}</th><th>{{i['yongjin']}}</th><th>{{i['selfsell']}}</th><th>{{i['downsell']}}</th><th>{{i['fankuan']}}</th><th>{{i['sellcont']}}</th>
 </tr>
     {% endif %}
 {% endfor %}
