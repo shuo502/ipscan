@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 import json
 import time
+from decimal import *
 import requests, re
 
 # {"user":"root","passwd":"abcdefg","host":"2211.cc","port":"3306","dbname":"t7","charset":"utf8","secret_key":"abcdefghijklmn"}
@@ -14,11 +15,13 @@ try:
 except:
     s = '{"user":"user","passwd":"password","host":"host","port":"3306","dbname":"t7","charset":"utf8","secret_key":"abcdefghijklmn"}'
     open('key.json', 'w', encoding='utf-8').write(s)
-    print("编辑key.json")
+    # print("编辑key.json")
     exit()
 basedir = os.path.abspath(os.path.dirname(__file__))
-mysql_config = 'mysql+pymysql://{}:{}@{}:{}/{}?charset={}'.format(key['user'], key['passwd'], key['host'], key['port'],
-                                                                  key['dbname'], key['charset'])
+mysql_config = 'mysql+pymysql://{}:{}@{}:{}/{}?charset={}'.format(key['user'], key['passwd'], key['host'], key['port'], key['dbname'], key['charset'])
+# mysql_cuk = 'mysql+pymysql://{}:{}@{}:{}/{}?charset={}'.format(key['user'], key['passwd'], key['host'], key['port'],'tcuk_w7', key['charset'])
+mysql_cuk ="mysql+pymysql://root:{}@{}:3306/{}?charset=utf8mb4".format(key['otherdb_passwd'],key['otherdb_host'],key['otherdb_dbname'])
+
 sqlite_config = 'sqlite:///' + os.path.join(basedir, 'app.db')
 
 
@@ -28,9 +31,20 @@ class Config(object):
     SECRET_KEY = key['secret_key']
     PERMANENT_SESSION_LIFETIME = timedelta(days=7)
     REMEMBER_COOKIE_DURATION = timedelta(hours=2)
+
+    #配置同时连接多数据库
+    SQLALCHEMY_BINDS = {
+        'dls':mysql_config,
+        'tcuk_w7':mysql_cuk
+    }
+
+    # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'  # 默认数据库引擎
+    # app.config['SQLALCHEMY_BINDS'] = SQLALCHEMY_BINDS
+    # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    #
     # 设置session的保存时间。
     # SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or   sqlite_config
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or mysql_config
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or mysql_config #连接默认数据库
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -43,8 +57,84 @@ app.config.from_object(Config)
 base_path_dir = os.path.abspath(os.path.dirname(__file__))
 db = SQLAlchemy(app)
 
+# class hj_share_DB(db.Model):
+#     __bind_key__ = 'tcuk_w7'
+#     __tablename__ = 'hjmall_share'
+#     # 代理商信息
+#     '''
+#     id
+#     user_id
+#     mobile
+#     name
+#     status
+#     id_delete
+#     addtime
+#
+#     '''
+
+# class hj_order_detail_DB(db.Model):
+#     __bind_key__ = 'tcuk_w7'
+#     __tablename__ = 'hjmall_order_detail'
+# #     订单明细
+#     '''
+#     id
+#     order_id
+#     goods_id
+#     num
+#     total_price
+#     addtime
+#     is_delete
+#
+#     '''
+
+class hj_order_DB(db.Model):
+    __bind_key__ = 'tcuk_w7'
+    __tablename__ = 'hjmall_order'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+
+    user_id=db.Column(db.Integer, default=0, comment="")
+    order_no=db.Column(db.String(255), nullable=True, comment="")
+    total_price=db.Column(db.DECIMAL(10, 2),  comment="")
+    pay_price=db.Column(db.DECIMAL(10, 2),  comment="")
+    express_price=db.Column(db.DECIMAL(10, 2),  comment="")
+    name=db.Column(db.String(255), nullable=True, comment="")
+    mobile=db.Column(db.String(255), nullable=True, comment="")
+    address=db.Column(db.String(255), nullable=True, comment="")
+    remark=db.Column(db.String(255), nullable=True, comment="")
+    is_pay=db.Column(db.Integer, default=0, comment="")
+    pay_type=db.Column(db.Integer, default=0, comment="")
+    is_send=db.Column(db.Integer, default=0, comment="")
+    send_time=db.Column(db.Integer, default=0, comment="")
+    is_confirm=db.Column(db.Integer, default=0, comment="")
+    confirm_time=db.Column(db.Integer, default=0, comment="")
+    apply_delete=db.Column(db.Integer, default=0, comment="")
+    __table_args__ = {
+        "mysql_charset": "utf8mb4"
+    }
+
+class hj_user_DB(db.Model):
+    __bind_key__ = 'tcuk_w7'
+    __tablename__ = 'hjmall_user'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username=db.Column(db.String(255), nullable=True, comment="")
+    is_delete=db.Column(db.Integer, default=0, comment="")
+    wechat_open_id=db.Column(db.String(255), nullable=True, comment="")
+    nickname=db.Column(db.String(255), nullable=True, comment="")
+    is_distributor=db.Column(db.Integer, default=0, comment="")
+    parent_id=db.Column(db.Integer, default=0, comment="")
+    parent_user_id=db.Column(db.Integer, default=0, comment="")
+    time=db.Column(db.Integer, default=0, comment="")
+    level=db.Column(db.Integer, default=0, comment="")
+    money=db.Column(db.DECIMAL(10, 2),  comment="")
+    __table_args__ = {
+        "mysql_charset": "utf8mb4"
+    }
+
+
+
 
 class dls_info_DB(db.Model):
+    __bind_key__ = 'dls'
     __tablename__ = 'dlsinfodb'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(255), nullable=True, comment="")
@@ -70,6 +160,7 @@ class dls_info_DB(db.Model):
 
 
 class dls_log_DB(db.Model):
+    __bind_key__ = 'dls'
     __tablename__ = 'dlsdblog'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user = db.Column(db.String(255), nullable=True, comment="")
@@ -244,36 +335,36 @@ def tui_daili(selfid=None, updl_is_h=None):
     x = 0
     while 1:
         x = x + 1
-        print(x)
+        # print(x)
         # 逐级退待收利润
         if int(x_up_id) > 0:
-            print(x_up_id)
+            # print(x_up_id)
             dbs = dls_info_DB.query.filter_by(id=int(x_up_id)).first()
             lrhk = (tui_dl_qian / dbs.zk - tui_dl_qian / x_up_zk)  # 上级代理折扣-现在代理折扣等于代理折扣利润  代理商货款利润
             dbs.downdl_huokuan = float('%.2f' % float(dbs.downdl_huokuan - tui_huokuan))  # 总计下级代理结余货款 退代理的手上的货款  代理商货款
             dbs.downdl_dslirun = float('%.2f' % float(dbs.downdl_dslirun - lrhk * dbs.zk))  # 待收利润  剩余利润
-            print("1---")
+            # print("1---")
 
             logs = dls_log_DB()
             logs.something = "[id{}:{}]退代理商,[id{}:{}]作为上级扣除自己账户下级退代理货款后{}，扣除自己代收利润后{}".format(dbs1.id, dbs1.name,dbs.id,dbs.name,dbs.downdl_huokuan,dbs.downdl_dslirun)
             db.session.add(logs)
 
             db.session.commit()
-            print("2---")
+            # print("2---")
 
             x_up_id = dbs.updl
             x_up_zk = dbs.zk
-            print(dbs.zk)
-            print(dbs.updl)
+            # print(dbs.zk)
+            # print(dbs.updl)
 
 
         else:
-            print("out")
+            # print("out")
             # 到公司，退出
             break
     # 安排 下级代理交接 接收退代理用户的下级代理
     # 下级代理标记交接
-    print("标记代理")
+    # print("标记代理")
     dbs = dls_info_DB.query.filter_by(id=int(selfid)).first()
     if updl_is_h:
         updl = updl_is_h
@@ -335,7 +426,7 @@ def tixian(selfid=None, tiqian=None):
         tiqian = 100
     if selfid == 0: return "公司"
     dbs = dls_info_DB.query.filter_by(id=int(selfid)).first()
-    if float(tiqian) > float(dbs.downdl_yslirun): return "钱不够啊"
+    if float(tiqian) > float(dbs.downdl_yslirun): return "钱不够啊" # 对比
     dbs.downdl_yslirun = float(dbs.downdl_yslirun) - float(tiqian)
     dbs.downdl_txlirun = float(dbs.downdl_txlirun) + float(tiqian)
     logs = dls_log_DB()
@@ -412,7 +503,7 @@ def buy(selfid=None, buy_pp=None):
         buy_pp = 1000
     if selfid == 0: return "公司"
     dbs = dls_info_DB.query.filter_by(id=int(selfid)).first()
-    if dbs.huokuan < buy_pp: return "钱不够。。。"
+    # if dbs.huokuan < buy_pp: return "钱不够。。。"#对比
     dbs.selfbuy=dbs.selfbuy+buy_pp
     dbs.huokuan = float(dbs.huokuan) - float(buy_pp)
     selfname=dbs.name
@@ -504,7 +595,7 @@ def exttab(selfid=None, buy_pp=None):
         x.append([self.id,self.name,d[self.updl], float('%.2f' % float(self.huokuan*self.zk)),self.zk,self.downdl_yslirun,float('%.2f' % float(self.downdl_huikuan*self.zk)),self.selfbuy])
     hk=hk*0.25
     x.append([0,'公司',0,0,0,hk])
-    print(x)
+    # print(x)
     return render_template('suan.html',x=x)
 
     # self.huokuan, self.dengji,
@@ -522,14 +613,237 @@ def exttab(selfid=None, buy_pp=None):
     pass
 
 
-@app.route("/sells", endpoint="sells", methods=['GET', 'POST'])
-def sells(selfid=None, buy_pp=None):
+# @app.route("/sells", endpoint="sells", methods=['GET', 'POST'])
+# def sells(selfid=None, buy_pp=None):
+#     if request.method == 'GET':
+#         o = look_dls()
+#         out = """<br> <form action="#" method=post><dl><dt>自己的id selfid:<dd><input type=text name=selfid><dt>消费金额 buy_pp:<dd><input type=text name=buy_pp><dd><input type=submit value=提交></dl></form>"""
+#         return o + out
+#     elif request.method == 'POST':
+#         selfid = request.form['selfid']
+#         buy_pp = float(request.form['buy_pp'])
+#         pass
+#     else:
+#         selfid = 0
+#         buy_pp = 1000
+#
+#     pass
+#     return ""
+
+@app.route("/change_zk", endpoint="change_zk", methods=['GET', 'POST'])
+def change_zk(selfid=None, zk=None):
+    if request.method == 'GET':
+        o = look_dls()
+        out = """<br> <form action="#" method=post><dl><dt>要修改的id selfid:<dd><input type=text name=selfid><dt>修改的折扣 小于1:<dd><input type=text name=zk><dd><input type=submit value=提交></dl></form>"""
+        return o + out
+    elif request.method == 'POST':
+        selfid = request.form['selfid']
+        zk = float(request.form['zk'])
+        pass
+    else:
+        selfid = 0
+        zk = 1
+    self = dls_info_DB.query.filter_by(id=int(selfid)).first()
+    if zk<=1:
+        self.zk=float(zk)
+        db.session.commit()
     pass
-    return ""
+    return "success change zk"
+
+
+
+@app.route("/change_gx", endpoint="change_gx", methods=['GET', 'POST'])
+def change_gx(selfid=None, change_updl=None):
+    if request.method == 'GET':
+        o = look_dls()
+        out = """<br> <form action="#" method=post><dl><dt>要修改的id selfid:<dd><input type=text name=selfid><dt>修改上级的id:<dd><input type=text name=change_updl><dd><input type=submit value=提交></dl></form>"""
+        return o + out
+    elif request.method == 'POST':
+        selfid = request.form['selfid']
+        change_updl = int(request.form['change_updl'])
+        pass
+    else:
+        selfid = 0
+        change_updl = 1
+
+    self = dls_info_DB.query.filter_by(id=int(selfid)).first()
+    # 检查代理关系
+    err=1
+    dbs=self
+    while 1:
+        if dbs.updl==int(selfid):
+            err=0
+            break
+        if dbs.updl == 0:
+            break
+        dbs=dls_info_DB.query.filter_by(id=int(self.updl)).first()
+
+    if err:
+        self.updl=int(change_updl)
+        db.session.commit()
+    else:
+        return "err"
+
+    # 我的上级有没有我的下级。
+    # 获取上级
+    # 获取下级
+    #如果我的上级有我
+    # 出错
+
+    return "success"
+
+@app.route("/get_gx", endpoint="get_gx", methods=['GET', 'POST'])
+def get_gx():
+    dbs=hj_user_DB.query.filter_by().all()
+    global user_dict
+    user_dict={}#防止历史数据出错
+    # i.level
+    zk_dict={
+        '-1': 1,
+        '0': 1,
+        '4':2.5,
+        '3':3.5,
+        '2':5,
+        '1':7,
+    }
+    for i in dbs:
+        if i.is_delete==0:
+            print(i.level)
+            zk=zk_dict[str(i.level)]
+            # user_dict[i.id]={'id':i.id,'username':i.username,'open_id':i.wechat_open_id,'nickname':i.nickname,'is_distributor':i.is_distributor,'parent_id':i.parent_id,'parent_user_id':i.parent_user_id,'time':i.time,'level':i.level,'money':i.money,'zk':zk}
+            user_dict[i.id]={'id':i.id,'nickname':i.nickname,'is_distributor':i.is_distributor,'parent_id':i.parent_id,'parent_user_id':i.parent_user_id,'time':i.time,'level':i.level,'money':i.money,'zk':zk}
+            user_dict[i.id]['selfsell']=0
+            user_dict[i.id]['downsell']=0
+            user_dict[i.id]['yongjin']=0
+            user_dict[i.id]['koumoney']=0
+            user_dict[i.id]['fankuan']=0
+
+    e={}
+    for i in user_dict:
+
+        if int(user_dict[i]['is_distributor']) !=1:
+            pass
+            # e[user_dict[i]['id']]['updl'] = "普通用户"
+        else:
+            e[user_dict[i]['id']] = user_dict[i]
+            updl = user_dict[i]['parent_id']
+            if updl>0:
+                e[user_dict[i]['id']]['updl']=user_dict[updl]['nickname']
+            else:
+                e[user_dict[i]['id']]['updl']="总代"
+    for x in e:
+        i=e[x]
+        # print(e[i])
+        r="id:{} {} 上级代理{} {} 折扣等级{}  账户余额{}".format(i["id"],i["nickname"],i['parent_id'],i['updl'],i['level'],i['money'])
+        print(r)
+    return "r"
+
+@app.route("/get_sell", endpoint="get_sell", methods=['GET', 'POST'])
+def get_sell():
+    get_gx()
+    o=hj_order_DB.query.filter_by().all()
+    global user_dict, user_dict_log
+    change_user_dict=user_dict
+    sell_dict={}
+    for i in o:
+
+        if int(i.is_confirm)==1: #收货
+            if i.user_id not in sell_dict:sell_dict[i.user_id]=[]
+            # print(i.confirm_time)#收货时间
+            # print(user_dict[i.user_id]['nickname'])#下单用户
+            # print(i.total_price)#销售
+            # dates=time.strftime("%Y/%m/%d %H:%M:%S", i.confirm_time)
+            #当天-开始时间  当天-结束时间。
+            timeArray = time.localtime( i.confirm_time)
+
+            otherStyleTime = time.strftime("%Y-%m-%d %H:%M:%S" , timeArray)
+            # str=timeArray = time.strptime(dates,  "%Y-%m-%d %H:%M:%S" )
+            e="用户：{}{} 下单实收金额{} 原价{}下单时间{}".format(i.user_id,user_dict[i.user_id]['nickname'],i.pay_price,i.total_price,otherStyleTime)
+            sell_dict[i.user_id].append(e)
+            print(e)
+            change_user_dict=sell_logic(change_user_dict,i.user_id,i.pay_price)
+
+    user_dict=change_user_dict
+    for i in user_dict:
+        if int(user_dict[i]['is_distributor']) != 1:
+            pass
+        else:
+            print(user_dict[i])
+    # print(user_dict)
+    for i in user_dict_log:
+        print(user_dict_log[i])
+
+    r=render_template('t.html',x=user_dict,sell_d=sell_dict,log_s=user_dict_log)
+
+    return r
+
+
+    # 提取销售数据
+    #插入数据库 写入销售。计算
+    #
+    pass
+@app.route("/set_null", endpoint="set_null", methods=['GET', 'POST'])
+def set_null():
+
+    # 清空
+    #
+    pass
+
+"""
+获取订单
+还原折扣额
+计算。
+
+"""
+def logic_logs(sellid,msg):
+    t=time.time()
+    global user_dict_log
+    if sellid not in  user_dict_log:
+        user_dict_log[sellid]=[]
+    user_dict_log[sellid].append("{} - {}".format(t,msg))
+
+def sell_logic(in_user_info,sellid,zksellpp):
+    # 折扣还原成销售金额
+    if len(in_user_info)<=0 or sellid<=0 or zksellpp<=0:
+        return in_user_info
+    user_info=in_user_info
+    i_am=user_info[sellid]
+    if "selfsell" not in  i_am:
+        i_am['selfsell']=0
+    sellpp= float('%.2f' % float(float(zksellpp)/float(i_am['zk'])*10))#还原原价
+    i_am['selfsell'] = float(i_am['selfsell']) + float(sellpp)
+    selfname = i_am['nickname']
+    i_am['fankuan'] =i_am['selfsell']+i_am['downsell']+i_am['yongjin']
+    i_am['koumoney'] = i_am['selfsell'] + i_am['downsell']
+    logic_logs(i_am['id'],"[id{}:{}] 下单扣货款{} 货款{},本月总计下单货款{},销售反货款{}(需从货款中扣除),账户打钱{}".format(i_am['id'], i_am['nickname'], sellpp, i_am['money'], i_am['selfsell'],i_am['koumoney'],i_am['fankuan']))
+    user_info[i_am['id']]=i_am
+    new_p=i_am
+    # 安排返利
+    while 1:
+        x_up_id = new_p['parent_id']
+        x_up_zk = i_am['zk']
+        db.session.commit()
+        # 利润安排
+        if int(x_up_id) > 0:
+            new_p={}
+            new_p=user_info[x_up_id]
+            yj =  float('%.2f' % float(float(sellpp) * float(x_up_zk)/10 - float(sellpp) * float(new_p['zk'])/10 )) # 每个级别利润差
+            new_p['downsell'] =  float('%.2f' % float(float(new_p['downsell']) +float(sellpp)))
+            new_p['yongjin'] = float(new_p['yongjin'])+float(yj)
+            new_p['fankuan'] =  float('%.2f' % float(new_p['selfsell'] + new_p['downsell'] + new_p['yongjin']))
+            new_p['koumoney'] =  float('%.2f' % float(new_p['selfsell'] + new_p['downsell']))
+            user_info[new_p['id']] = new_p
+            logic_logs(new_p['id'],"[id{}:{}]折扣销售{},上级代理[id{}:{}],本单获得佣金{},代理账户获得返款{}".format(sellid, selfname,zksellpp , new_p['id'], new_p['nickname'], yj,sellpp))
+        else:
+            break
+
+    return user_info
 
 
 if __name__ == "__main__":
+    user_dict={}
+    user_dict_log={}
     pass
     # get_content_to_db()
-    app.run(debug=True, host="0.0.0.0", port=5001)
+    app.run(debug=True, host="192.168.0.147", port=5001)
     # app.run(debug=False)

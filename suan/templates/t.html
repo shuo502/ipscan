@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>display_table</title>
+</head>
+<body>
+
+<!-- CSS goes in the document HEAD or added to your external stylesheet -->
+<style type="text/css">
+table.gridtable {
+font-family: verdana,arial,sans-serif;
+font-size:11px;
+color:#333333;
+border-width: 1px;
+border-color: #666666;
+border-collapse: collapse;
+}
+table.gridtable th {
+border-width: 1px;
+padding: 8px;
+border-style: solid;
+border-color: #666666;
+background-color: #dedede;
+}
+table.gridtable td {
+border-width: 1px;
+padding: 8px;
+border-style: solid;
+border-color: #666666;
+background-color: #ffffff;
+}
+</style>
+
+<!-- Table goes in the document BODY -->
+<table border="1" class="gridtable">
+<tr>
+<th>id编号</th><th>代理商姓名</th><th>上级代理</th><th>应收款</th><th>拿货折扣</th><th>佣金</th><th>直接销售(原价计算)</th><th>代理销售(原价计算)</th><th>反钱</th>
+</tr>
+
+{%  for dl in x %}
+    {% set i=x[dl] %}
+
+    {% if i['is_distributor']==1 %}
+<tr>
+<th>{{i['id']}}</th><th>{{i['nickname']}}</th><th>{{i['updl']}}</th><th>{{i['money'] }} 扣反还{{ i['koumoney'] }}</th><th>{{i['zk']}}</th><th>{{i['yongjin']}}</th><th>{{i['selfsell']}}</th><th>{{i['downsell']}}</th><th>{{i['fankuan']}}</th>
+</tr>
+    {% endif %}
+{% endfor %}
+
+
+</table>
+
+ <a>导出表格</a>
+
+
+    <script>
+        // 使用outerHTML属性获取整个table元素的HTML代码（包括<table>标签），然后包装成一个完整的HTML文档，设置charset为urf-8以防止中文乱码
+        var html = "<html><head><meta charset='utf-8' /></head><body>" + document.getElementsByTagName("table")[0].outerHTML + "</body></html>";
+        // 实例化一个Blob对象，其构造函数的第一个参数是包含文件内容的数组，第二个参数是包含文件类型属性的对象
+        var blob = new Blob([html], { type: "application/vnd.ms-excel" });
+        var a = document.getElementsByTagName("a")[0];
+        // 利用URL.createObjectURL()方法为a元素生成blob URL
+        a.href = URL.createObjectURL(blob);
+        // 设置文件名
+        a.download = "giftable.xls";
+    </script>
+
+<table border="1" class="gridtable">
+<tr>
+<th>用户</th><th>销售信息</th>
+</tr>
+{%  for sell in sell_d %}
+    {%  for i in sell_d[sell] %}
+    <tr>
+    <th>{{sell}}</th> <th>{{i}}</th>
+    </tr>
+  {% endfor %}
+{% endfor %}
+</table>
+
+
+<table border="1" class="gridtable">
+<tr>
+<th>用户</th><th>佣金返款信息</th>
+</tr>
+{%  for dl in log_s %}
+    {%  for i in log_s[dl] %}
+    <tr>
+    <th>{{dl}}</th> <th>{{i}}</th>
+    </tr>
+  {% endfor %}
+{% endfor %}
+</table>
+
+</body>
+</html>
